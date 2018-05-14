@@ -1,9 +1,9 @@
 Selinux Troubleshooting Guide
 =============================
-Author Name athias@protonmail.com
 :Author: Matthew Sawyer
 :Email: athias@protonmail.com
 :Date: 14 May 2018
+:toc:
 
 This is a quick troubleshooting guide for the most commonly seen selinux issues.
 
