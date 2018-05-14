@@ -5,25 +5,28 @@ Selinux Troubleshooting Guide
 :Date: 14 May 2018
 :toc:
 
-This is a quick troubleshooting guide for the most commonly seen selinux issues.
+== Introduction
 
-== Scenario
+This guide is intended to provide examples of commonly seen selinux errors.  Following a common scenario we will re-create these common issues, identify the selinux error, and correct the issue.
 
-The scenario given for these will be an internal web server used to host various essential administrative files.
+This is not intended to be the perfect answer to every situation, nor is it meant to answer highly complex selinux issues.
 
-.Web Hosted Information
-* Local RPM Repository
-** Hosted from a separate directory
-** Synchronized daily
-* Custom System Data
-** Consumed regularly by other servers
-** Compiled from multiple sources
-* Configuration Scripts
-** Used when provisioning new servers
-** Infrequently modified
-* Generic Web Page
-** Only the essentials
-** HTML 1.0 compliant
+NOTE: This guide is based on Red Hat Enterprise Linux 7.  The specific steps used may differ when using other operating systems.
+
+== The Scenario
+
+.Common selinux issues encountered:
+* selinux context not set correctly
+** define selinux context for directory
+** restore selinux context for directory
+* selinux boolean must be configured
+* custom selinux policy must be created
+
+.Examples displaying common issues:
+* Web Hosted - Local RPM Repository
+* Web Hosted - Custom System Data
+* Web Hosted - Configuration Scripts
+* NFS Home Directories
 
 == Is selinux the problem
 
