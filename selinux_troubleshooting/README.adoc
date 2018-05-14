@@ -5,14 +5,37 @@ Author Name athias@protonmail.com
 :Email: athias@protonmail.com
 :Date: 14 May 2018
 
-This is a quick troubleshooting guide for the most commonly seen selinux issues, and how to fix them.
+This is a quick troubleshooting guide for the most commonly seen selinux issues.
+
+== Scenario
+
+The scenario given for these will be an internal web server used to host various essential administrative files.
+
+.Web Hosted Information
+* Local RPM Repository
+** Hosted from a separate directory
+** Synchronized daily
+* Custom System Data
+** Consumed regularly by other servers
+** Compiled from multiple sources
+* Configuration Scripts
+** Used when provisioning new servers
+** Infrequently modified
+* Generic Web Page
+** Only the essentials
+** HTML 1.0 compliant
 
 == Is selinux the problem
 
 Before you even begin troubleshooting, you first want to pass what is effectively the idiot test.  A simple test to determine whether or not selinux is really the issue.
 
-* # setenforce 0
-* (run process)
+.Temporarily Disable Selinux
+----
+Disable selinux
+  # setenforce 0
+Restart httpd
+  # systemctl restart httpd
+
 * # setenforce 1
 
 
