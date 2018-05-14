@@ -1,11 +1,11 @@
-Selinux Troubleshooting Guide
+[blue]Selinux Troubleshooting Guide
 =============================
 :Author: Matthew Sawyer
 :Email: athias@protonmail.com
 :Date: 14 May 2018
 :toc:
 
-== Introduction
+== [blue]Introduction
 
 This guide is intended to provide examples of commonly seen selinux errors.  Following a common scenario we will re-create these common issues, identify the selinux error, and correct the issue.
 
