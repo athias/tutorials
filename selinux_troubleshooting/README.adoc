@@ -1,0 +1,18 @@
+Selinux Troubleshooting Guide
+=============================
+Author Name athias@protonmail.com
+:Author: Matthew Sawyer
+:Email: athias@protonmail.com
+:Date: 14 May 2018
+
+This is a quick troubleshooting guide for the most commonly seen selinux issues, and how to fix them.
+
+== Is selinux the problem
+
+Before you even begin troubleshooting, you first want to pass what is effectively the idiot test.  A simple test to determine whether or not selinux is really the issue.
+
+* # setenforce 0
+* (run process)
+* # setenforce 1
+
+
