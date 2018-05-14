@@ -7,7 +7,7 @@ Selinux Troubleshooting Guide
 
 == Introduction
 
-[blue]This guide is intended to provide examples of commonly seen selinux errors.  Following a common scenario we will re-create these common issues, identify the selinux error, and correct the issue.
+[red]This guide is intended to provide examples of commonly seen selinux errors.  Following a common scenario we will re-create these common issues, identify the selinux error, and correct the issue.
 
 This is not intended to be the perfect answer to every situation, nor is it meant to answer highly complex selinux issues.
 
