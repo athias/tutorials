@@ -7,7 +7,7 @@ Selinux Troubleshooting Guide
 
 == Introduction
 
-[red]This guide is intended to provide examples of commonly seen selinux errors.  Following a common scenario we will re-create these common issues, identify the selinux error, and correct the issue.
+This guide is intended to provide examples of commonly seen selinux errors.  Following a common scenario we will re-create these common issues, identify the selinux error, and correct the issue.
 
 This is not intended to be the perfect answer to every situation, nor is it meant to answer highly complex selinux issues.
 
@@ -26,11 +26,13 @@ NOTE: This guide is based on Red Hat Enterprise Linux 7.  The specific steps use
 * Web Hosted - Configuration Scripts
 * NFS Home Directories
 
-== Is selinux the problem
+== Is it really selinux
 
-Before you even begin troubleshooting, you first want to pass what is effectively the idiot test.  A simple test to determine whether or not selinux is really the issue.
+Before you even begin troubleshooting, you should try a simple test to determine if selinux really is the issue.  This is the most basic test that answers the question - Does it work when selinux is turned off, and fail when selinux is turned back on?  To answer this question, we simply turn selinux off temporarily and verify it works.
 
-.Temporarily Disable Selinux
+===Example 1
+
+
 ----
 Disable selinux
   # setenforce 0

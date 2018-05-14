@@ -1,0 +1,114 @@
+Selinux Troubleshooting - Lab Setup
+===================================
+:Author: Matthew Sawyer
+:Email: athias@protonmail.com
+:Date: 14 May 2018
+:toc:
+
+== Introduction
+
+This is guide to explain how the lab was set up to simulate the examples provided in the selinux troubleshooting guide.  This is intended for those people who want an extra level of understanding.
+
+== Basic Server Installation
+
+This is assumed to be a standard installation of RHEL 7.x - with the DVD available after installation.
+
+.Initial Installation:
+* Minimal Installation
+* 100G disk Partitioned
+** 10G /
+** 4G [SWAP]
+** 2G /home
+** 5G /tmp
+** 15G /var
+** 2G /var/log
+** 2G /var/log/audit
+** 10G /repo
+** 10G /nfs
+* Custom User - admin_local
+
+== Server Post Installation
+
+=== Configure yum and install packages
+```
+# printf "[disc]\nbaseurl=file:///mnt\nname=disc\nenabled=1\ngpgcheck=1\n"
+# rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+# mount /dev/sr0 /mnt
+# yum -y groupinstall "Base"
+# yum -y install httpd nfs-utils createrepo
+```
+
+=== Change home directory
+```
+# umount /home
+# mkdir /local_home
+# sed -i 's/\/home/\/local_home/' /etc/fstab
+# sed -i 's/\/home\/admin_local/\/local_home\/admin_local/' /etc/passwd
+# mount /local_home
+```
+
+=== Configure NFS and firewalld
+```
+# printf "/nfs *(rw,no_all_squash,no_root_squash)" > /etc/exports
+# firewall-cmd --add-service={nfs,http} --permanent
+# firewall-cmd --add-port={111/tcp,111/udp} --permanent
+# firewall-cmd --reload
+# systemctl enable nfs-server
+# systemctl start nfs-server
+# exportfs -a
+# printf "127.0.0.1:/nfs\t/home\tnfs\tdefaults,_netdev\t0\t0\n" >> /etc/fstab
+# mount -a
+```
+
+=== Create Test User
+```
+# useradd -b /home/testuser -d /home/testuser -k /etc/skel -m testuser
+# passwd testuser
+  (input password twice)
+```
+
+=== Create Repo and configure http
+```
+# reposync -m -n -g -d -p /repo
+# createrepo --basedir=/repo/disc/ -g /repo/disc/comps.xml /repo/disc/
+# ln -s /repo/disc/ /var/www/html/repo
+# printf "[http-disc]\nbaseurl=http://127.0.0.1/repo\nname=http-disc\nenabled=1\ngpgcheck=1\n" > /var/www/html/http-disc.repo
+# printf 'Welcome to the selinux troubleshooting guide test VM!\n' > /var/www/html/index.html
+# mkdir /custom_data
+# touch /custom_data/data1 /custom_data/data2 /custom_data/data3 /custom_data/data4
+# ln -s /custom_data/ /var/www/html/custom_data
+```
+
+=== Configure selinux contexts
+```
+# chcon -u system_u -t usr_t /custom_data/*
+# restorecon -RFvv /repo
+# restorecon -RFvv /nfs
+# restorecon -RFvv /home
+# systemctl restart httpd
+```
+
+=== Configure yum for http
+```
+# curl -k http://127.0.0.1/index.html > /tmp/index.html
+# cat /tmp/index.html
+  (verify it works)
+# sed -i 's/enabled=1/enabled=0/' /etc/yum.repos.d/disc.repo
+# yum clean all
+# yum repolist
+  (verify it fails)
+# setenforce 0
+# yum repolist
+  (verify it succeeds)
+# setenforce 1
+# yum clean all
+```
+
+
+
+
+
+
+
+
+
