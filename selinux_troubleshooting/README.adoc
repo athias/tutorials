@@ -13,17 +13,14 @@ This is not intended to be the perfect answer to every situation, nor is it mean
 
 NOTE: This guide is based on Red Hat Enterprise Linux 7.  The specific steps used may differ when using other operating systems.
 
-== The Scenario
+== The Scenarios
 
-.Common selinux issues encountered:
+.Common selinux issues presented:
 * selinux context not set correctly
-** define selinux context for directory
-** restore selinux context for directory
 * selinux boolean must be configured
 * custom selinux policy must be created
 
-
-.Examples displaying common issues:
+.Scenarios displaying common issues:
 * Web Hosted - Local RPM Repository
 * Web Hosted - Custom System Data
 * Web Hosted - Configuration Scripts
