@@ -22,6 +22,7 @@ NOTE: This guide is based on Red Hat Enterprise Linux 7.  The specific steps use
 * selinux boolean must be configured
 * custom selinux policy must be created
 
+
 .Examples displaying common issues:
 * Web Hosted - Local RPM Repository
 * Web Hosted - Custom System Data
