@@ -23,22 +23,22 @@ NOTE: This guide is based on Red Hat Enterprise Linux 7.  The specific steps use
 
 All of these issues and scenarios presented can be recreated and practiced on your own.  For this I created the https://github.com/athias/tutorials/blob/master/SELinux_troubleshooting/LAB_setup.adoc[SELinux Troubleshooting Guide - Lab Setup] used to make this guide.
 
-.Common SELinux issues presented:
-* SELinux context not set correctly
-* SELinux boolean must be configured
-* custom SELinux policy must be created
-
-.Scenarios displaying common issues:
-* Web Hosted - Local RPM Repository
-* Web Hosted - Custom System Data
-* Web Hosted - Configuration Scripts
-* NFS Home Directories
+.SELinux Example issues:
+* Example 1
+** Web Hosted - Local RPM Repository
+** SELinux context not set correctly
+* Example 2
+** NFS Home Directories
+** SELinux boolean must be configured
+* Example 3
+** Web Hosted - Custom System Data
+** custom SELinux policy must be created
 
 == Is it really SELinux
 
 Before you even begin troubleshooting, you should try a simple test to determine if SELinux really is the issue.  This is the most basic test that answers the question - Does it work when SELinux is turned off, and fail when SELinux is turned back on?  To answer this question, we simply turn SELinux off temporarily and verify it works.
 
-=== Example 1
+=== Example 1 - Context
 
 We attempt to do a yum update, and we receive the error `HTTP Error 403 - Forbidden`.  This means something is wrong with the web server preventing access.  Since we run that web server, and we don't see any obvious issues - we disable SELinux to see what happens:
 
@@ -80,6 +80,9 @@ Logout, then login as testuser
 
 The results are very clear.  Temporarily disabling SELinux allows us to successfully perform the action as intended, and enabling SELinux causes it to fail again.  This quickly confirms that SELinux is causing t
 his issue.
+
+=== Example 3
+
 
 
 
