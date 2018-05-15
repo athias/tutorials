@@ -31,7 +31,7 @@ This is assumed to be a standard installation of RHEL 7.x - with the DVD availab
 
 === Configure yum and install packages
 ```
-# printf "[disc]\nbaseurl=file:///mnt\nname=disc\nenabled=1\ngpgcheck=1\n"
+# printf "[disc]\nbaseurl=file:///mnt\nname=disc\nenabled=1\ngpgcheck=1\n" > /etc/yum.repos.d/disc.repo
 # rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
 # mount /dev/sr0 /mnt
 # yum -y groupinstall "Base"
@@ -94,6 +94,7 @@ This is assumed to be a standard installation of RHEL 7.x - with the DVD availab
 # cat /tmp/index.html
   (verify it works)
 # sed -i 's/enabled=1/enabled=0/' /etc/yum.repos.d/disc.repo
+# curl -k http://127.0.0.1/http-disc.repo > /etc/yum.repos.d/http-disc.repo
 # yum clean all
 # yum repolist
   (verify it fails)
@@ -103,12 +104,3 @@ This is assumed to be a standard installation of RHEL 7.x - with the DVD availab
 # setenforce 1
 # yum clean all
 ```
-
-
-
-
-
-
-
-
-
