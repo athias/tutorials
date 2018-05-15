@@ -7,24 +7,26 @@ Selinux Troubleshooting Guide
 
 == Introduction
 
-This guide is intended to provide examples of commonly seen selinux errors.  Following a common scenario we will re-create these common issues, identify the selinux error, and correct the issue.
+This guide is intended to provide examples of commonly seen SELinux errors.  Following a common scenario we will re-create these common issues, identify the SELinux error, and correct the issue.
 
-This is not intended to be the perfect answer to every situation, nor is it meant to answer highly complex selinux issues.
+This is not intended to be the perfect answer to every situation, nor is it meant to answer highly complex SELinux issues.
 
 NOTE: This guide is based on Red Hat Enterprise Linux 7.  The specific steps used may differ when using other operating systems.
 
 == Other resources
 
-* https://people.redhat.com/duffy/selinux/selinux-coloring-book_A4-Stapled.pdf[The selinux coloring book]
-* https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/pdf/selinux_users_and_administrators_guide/Red_Hat_Enterprise_Linux-7-SELinux_Users_and_Administrators_Guide-en-US.pdf[SELinux Admin Guide for RHEL 7]
+* https://people.redhat.com/duffy/SELinux/SELinux-coloring-book_A4-Stapled.pdf[The SELinux coloring book]
+* https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/pdf/SELinux_users_and_administrators_guide/Red_Hat_Enterprise_Linux-7-SELinux_Users_and_Administrators_Guide-en-US.pdf[SELinux Admin Guide for RHEL 7]
 * http://freecomputerbooks.com/books/The_SELinux_Notebook-4th_Edition.pdf[The SELinux Notebook - 4th Edition]
 
 == The Scenarios
 
-.Common selinux issues presented:
-* selinux context not set correctly
-* selinux boolean must be configured
-* custom selinux policy must be created
+All of these issues and scenarios presented can be recreated and practiced on your own.  For this I created the https://github.com/athias/tutorials/blob/master/SELinux_troubleshooting/LAB_setup.adoc[SELinux Troubleshooting Guide - Lab Setup] used to make this guide.
+
+.Common SELinux issues presented:
+* SELinux context not set correctly
+* SELinux boolean must be configured
+* custom SELinux policy must be created
 
 .Scenarios displaying common issues:
 * Web Hosted - Local RPM Repository
@@ -32,19 +34,73 @@ NOTE: This guide is based on Red Hat Enterprise Linux 7.  The specific steps use
 * Web Hosted - Configuration Scripts
 * NFS Home Directories
 
-== Is it really selinux
+== Is it really SELinux
 
-Before you even begin troubleshooting, you should try a simple test to determine if selinux really is the issue.  This is the most basic test that answers the question - Does it work when selinux is turned off, and fail when selinux is turned back on?  To answer this question, we simply turn selinux off temporarily and verify it works.
+Before you even begin troubleshooting, you should try a simple test to determine if SELinux really is the issue.  This is the most basic test that answers the question - Does it work when SELinux is turned off, and fail when SELinux is turned back on?  To answer this question, we simply turn SELinux off temporarily and verify it works.
 
-===Example 1
+=== Example 1
 
+We attempt to do a yum update, and we receive the error `HTTP Error 403 - Forbidden`.  This means something is wrong with the web server preventing access.  Since we run that web server, and we don't see any obvious issues - we disable SELinux to see what happens:
 
-----
-Disable selinux
+```
+Check yum update
+  # yum update
+  Result: HTTP Error 403 - Forbidden
+Disable SELinux
   # setenforce 0
-Restart httpd
-  # systemctl restart httpd
+Check yum update
+  # yum update
+  Result: Success - No packages marked for update.
+Re-enable SELinux
+  # setenforce 1
+Clean yum cache and check update again
+  # yum clean all
+  # yum update
+  Result: HTTP Error 403 - Forbidden
+```
 
-* # setenforce 1
+The results are very clear.  Temporarily disabling SELinux allows us to successfully perform the action as intended, and enabling SELinux causes it to fail again.  This quickly confirms that SELinux is causing this issue.
+
+=== Example 2
+
+We attempt to log in as the user `testuser` to the system.  The login is successful, but we receive an error `/home/testuser: change directory failed: Permission denied`.  After we verify the basic permissions for the directory are correct, we disable SELinux and see what happens:
+
+```
+Login as testuser
+  Result: /home/testuser: change directory failed: Permission denied
+Disable SELinux
+  # setenforce 0
+Logout, then login as testuser
+  Result: Success - No issues noted
+Re-enable SELinux
+  # setenforce 1
+Logout, then login as testuser
+  Result: /home/testuser: change directory failed: Permission denied
+```
+
+The results are very clear.  Temporarily disabling SELinux allows us to successfully perform the action as intended, and enabling SELinux causes it to fail again.  This quickly confirms that SELinux is causing t
+his issue.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
