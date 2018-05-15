@@ -13,6 +13,13 @@ This is not intended to be the perfect answer to every situation, nor is it mean
 
 NOTE: This guide is based on Red Hat Enterprise Linux 7.  The specific steps used may differ when using other operating systems.
 
+== Other resources
+
+[The selinux coloring book](https://people.redhat.com/duffy/selinux/selinux-coloring-book_A4-Stapled.pdf)
+[SELinux Admin Guide for RHEL 7](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/pdf/selinux_users_and_administrators_guide/Red_Hat_Enterprise_Linux-7-SELinux_Users_and_Administrators_Guide-en-US.pdf)
+[The SELinux Notebook - 4th Edition](http://freecomputerbooks.com/books/The_SELinux_Notebook-4th_Edition.pdf)
+
+
 == The Scenarios
 
 .Common selinux issues presented:
