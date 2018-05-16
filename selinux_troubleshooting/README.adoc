@@ -65,11 +65,6 @@ Users: 8
    unconfined_u
 ```
 
-In addition, you can view your current login user context by running the `id -Z` command:
-```
-# id -Z
-unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023
-```
 
 === Role Contexts
 
@@ -104,11 +99,56 @@ Roles: 14
 
 === Type Contexts
 
-Type Enforcement (TE) is the most common usage within selinux.  Allowing or denying access between various context types is required to ensure processes have access to the things they need, and are restricted from those they don't.
+Type Enforcement (TE) is the most common usage within selinux.  Allowing or denying access between various context types is required to ensure processes have access to the things they need, and are restricted from those they don't.  You can view all available context types on the system by using the `seinfo -t` command:
+
+```
+# seinfo -t
+
+Types: 4757
+   bluetooth_conf_t
+   cmirrord_exec_t
+   ...
+   pki_tps_t
+   puppet_etc_t
+   ...
+   lvm_metadata_t
+   pki_tomcat_log_t
+   ...
+   systemd_bootchart_exec_t
+   wireshark_input_xevent_t
+```
+
+=== Determining Current Contexts
+
+Determining the current SELinux contexts associated with a user, file, or directory is essential.  The display of SELinux contexts follows the `user:role:type:MLS` format.
+
+You can view your current login user context by running the `id -Z` command:
+```
+# id -Z
+unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023
+```
+
+You can view the context of files and directories by running the `ls -Z` command:
+```
+# ls -lZ /
+lrwxrwxrwx. root root system_u:object_r:bin_t:s0       bin -> usr/bin
+dr-xr-xr-x. root root system_u:object_r:boot_t:s0      boot
+drwxr-xr-x. root root unconfined_u:object_r:default_t:s0 custom_data
+drwxr-xr-x. root root system_u:object_r:device_t:s0    dev
+...
+dr-xr-xr-x. root root system_u:object_r:sysfs_t:s0     sys
+drwxrwxrwt. root root system_u:object_r:tmp_t:s0       tmp
+drwxr-xr-x. root root system_u:object_r:usr_t:s0       usr
+drwxr-xr-x. root root system_u:object_r:var_t:s0       var
+```
 
 === Unconfined processes
 
 The specific contexts associated with the unconfined user space interact with the system in much the same way other SELinux contexts do.  For example, an unconconfined services running an *init* will run it as *unconfined_service_t*.  The important part to note is that default SELinux policies allows unconfined contexts almost all access within the system.
+
+=== Custom Policy Files
+
+
 
 == The Scenarios
 
