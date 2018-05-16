@@ -2,7 +2,7 @@ Selinux Troubleshooting Guide
 =============================
 :Author: Matthew Sawyer
 :Email: athias@protonmail.com
-:Date: 14 May 2018
+:Date: 16 May 2018
 :toc:
 
 == Introduction
@@ -148,7 +148,12 @@ The specific contexts associated with the unconfined user space interact with th
 
 === Custom Policy Files
 
+When you run into SELinux issues that require you to specify additional rules, you create custom policy files.  These custom policy files have a `.pp` extension and are loaded into the SELinux database.  These policy files can be created directly using `audit2allow` or indirectly from a `.te` file.  Creating it from a `.te` file allows you to verify the permission modifications in advance.
 
+.Custom Policy file types
+* `.pp` SELinux policy module
+* `.mod` local policy module
+* `.te` Type Enforcement file
 
 == The Scenarios
 
@@ -234,6 +239,74 @@ Curl to retrieve the data
 
 The results are very clear.  Temporarily disabling SELinux allows us to successfully perform the action as intended, and enabling SELinux causes it to fail again.  This quickly confirms that SELinux is causing t
 his issue.
+
+== Resolving the issues
+
+Once you have determined that SELinux is the issue, it's time to start searching through the audit logs to determine what is being denied.  This can be done directly by using the `cat` command on the log:
+
+```
+# cat /var/log/audit/audit.log | grep 'avc:  denied'
+
+type=AVC msg=audit(1526740594.200:2360): avc:  denied {search } ...
+...
+```
+
+It can also be viewed indirectly with the `ausearch` command:
+
+```
+# ausearch -m -AVC,USER_AVC -ts recent
+
+time->Wed May 16 11:36:29 2018
+type=USER_AVC msg=audit(1526470594.199:2358): .....
+...
+```
+
+=== Example 1
+
+We have identified that something is preventing the system from accessing the 
+
+```
+# ausearch -m AVC,USER_AVC -ts recent
+  /repo/disc/repodata/repomd.xml
+# chcon -t httpd_sys_content_t /repo/disc/repodata/repomd.xml
+# yum update
+  HTTP 403 - different file
+# ausearch -m AVC,USER_AVC -ts recent
+  /repo/disc/repodata/(a bunc of nubers).bz2
+# semanage -a -t httpd_sys_content_t "/repo/disc(/.*)?"
+# restorecon -nvv /repo/disc
+# restorecon -RFvv /repo/disc
+```
+
+=== Example 2
+
+```
+# ausearch -m AVC,USER_AVC -ts recent
+  login
+  nfs_t
+# semanage boolean -l
+# semanage boolean -l | grep nfs
+  use_nfs_home_dirs
+# setsebool use_nfs_home_dirs 1
+  Sets the system to allow the use of nfs home directories
+Login as testuser again
+```
+
+=== Example 3
+
+```
+# audit2allow
+# audit2allow -i /var/log/audit/audit.log -M custom_data
+  Generates custom_data.pp and custom_data.te
+# vim custom_data.te
+  Verify it has the permissions you want
+# checkmodule -M -m -o custom_data.mod custom_data.te
+  Generates custom_data.mod based on the updated custom_data.te
+# semodule_package -m custom_data.mod -o custom_data.pp
+  Generates (replaces) custom_data.pp from the custom_data.mod
+# semodule -i custom_data.pp
+```
+
 
 
 
