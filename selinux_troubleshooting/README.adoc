@@ -19,6 +19,97 @@ NOTE: This guide is based on Red Hat Enterprise Linux 7.  The specific steps use
 * https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/pdf/SELinux_users_and_administrators_guide/Red_Hat_Enterprise_Linux-7-SELinux_Users_and_Administrators_Guide-en-US.pdf[SELinux Admin Guide for RHEL 7]
 * http://freecomputerbooks.com/books/The_SELinux_Notebook-4th_Edition.pdf[The SELinux Notebook - 4th Edition]
 
+== Important RPMs
+
+.Essential tools for Troubleshooting
+* policycoreutils-python
+* setroubleshoot-server
+* setools-console
+* policycoreutils-gui
+
+.Development and Advanced Configurations
+* selinux-policy-devel
+* selinux-policy-doc
+* selinux-policy-mls
+* mcstrans
+
+== SELinux Basics
+
+SELinux is an implementation of Mandatory access control (MAC) developed originally by the National Security Agency (NSA) and provided to the open-source community.  Red Hat Enterprise Linux (RHEL) achieves this through a combination of Role-Based Access Control (RBAC), Type Enforcement (TE), and Multi-Level Security (MLS).
+
+Type Enforcement is the most common interaction dealt with concerning SELinux, as this allows or prevents processess from accessing the files that it requires to run.  A simple example would be allowing the `httpd` process read permissions on the `httpd_sys_content_t` tagged files and directories.
+
+==== User Context
+
+Each User on a RHEL system is associated with an SELinux User Context.  This causes that user to inherit the permissions or restrictions of that user context.  We can view these user login contexts by running the `semanage login -l` command:
+
+```
+# semanage login -l
+
+Login Name           SELinux User         MLS/MCS Range        Service
+
+__default__          unconfined_u         s0-s0:c0.c1023       *
+root                 unconfined_u         s0-s0:c0.c1023       *
+system_u             system_u             s0-s0:c0.c1023       *
+```
+
+You can view all available user contexts by running the `seinfo -u` command:
+```
+# seinfo -u
+
+Users: 8
+   sysadm_u
+   system_u
+   ...
+   user_u
+   unconfined_u
+```
+
+In addition, you can view your current login user context by running the `id -Z` command:
+```
+# id -Z
+unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023
+```
+
+=== Role Contexts
+
+Users are mapped to role contexts.  One common usage of this is controlling access to the `su` and `sudo` commands.  You can identify the user to role context mappings using the `semanage user -l` command:
+
+```
+# semanage user -l
+                Labeling   MLS/       MLS/                          
+SELinux User    Prefix     MCS Level  MCS Range                      SELinux Roles
+
+guest_u         user       s0         s0                             guest_r
+root            user       s0         s0-s0:c0.c1023                 staff_r sysadm_r system_r unconfined_r
+staff_u         user       s0         s0-s0:c0.c1023                 staff_r sysadm_r system_r unconfined_r
+sysadm_u        user       s0         s0-s0:c0.c1023                 sysadm_r
+system_u        user       s0         s0-s0:c0.c1023                 system_r unconfined_r
+unconfined_u    user       s0         s0-s0:c0.c1023                 system_r unconfined_r
+user_u          user       s0         s0                             user_r
+xguest_u        user       s0         s0                             xguest_r
+```
+
+You can additionally view all available roles on the system using the `seinfo -r` command:
+```
+# seinfo -r
+
+Roles: 14
+   auditadm_r
+   dbadm_r
+   ...
+   nx_server_r
+   unconfined_r
+```
+
+=== Type Contexts
+
+Type Enforcement (TE) is the most common usage within selinux.  Allowing or denying access between various context types is required to ensure processes have access to the things they need, and are restricted from those they don't.
+
+=== Unconfined processes
+
+The specific contexts associated with the unconfined user space interact with the system in much the same way other SELinux contexts do.  For example, an unconconfined services running an *init* will run it as *unconfined_service_t*.  The important part to note is that default SELinux policies allows unconfined contexts almost all access within the system.
+
 == The Scenarios
 
 All of these issues and scenarios presented can be recreated and practiced on your own.  For this I created the https://github.com/athias/tutorials/blob/master/SELinux_troubleshooting/LAB_setup.adoc[SELinux Troubleshooting Guide - Lab Setup] used to make this guide.
@@ -83,7 +174,26 @@ his issue.
 
 === Example 3
 
+We attempt to retrieve the custom data for use within our application and receive an error `HTTP Error 403 - Forbidden`.  This means something is wrong with the web server preventing access.  Since we run that web server, and we don't see any obvious issues - we disable SELinux to see what happens:
 
+```
+Curl to retrieve the data
+  # curl -k http://127.0.0.1/custom_data/data1
+  Result: HTTP Error 403 - Forbidden
+Disable SELinux
+  # setenforce 0
+Curl to retrieve the data
+  # curl -k http://127.0.0.1/custom_data/data1
+  Result: Success - data1 read
+Re-enable SELinux
+  # setenforce 1
+Curl to retrieve the data
+  # curl -k http://127.0.0.1/custom_data/data1
+  Result: HTTP Error 403 - Forbidden
+```
+
+The results are very clear.  Temporarily disabling SELinux allows us to successfully perform the action as intended, and enabling SELinux causes it to fail again.  This quickly confirms that SELinux is causing t
+his issue.
 
 
 
